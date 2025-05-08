@@ -145,31 +145,3 @@ add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
         $cart->add_fee( $label, $adjustment, false );
     }
 });
-
-// Clear related transients when settings are updated to avoid caching issues (e.g. with Redis Object Cache)
-add_action( 'update_option_spf_settings', function () {
-    global $wpdb;
-
-    // Direct DB query is used here to identify transients by pattern.
-// WordPress does not provide a native API to list/delete transients by wildcard.
-$transients = $wpdb->get_col("
-        SELECT option_name FROM {$wpdb->options}
-        WHERE option_name LIKE '_transient_%'
-        AND (
-            option_name LIKE '%woocommerce_cart%' OR
-            option_name LIKE '%wc_cache%' OR
-            option_name LIKE '%spf%'
-        )
-    ");
-
-    foreach ( $transients as $transient ) {
-        $key = str_replace( '_transient_', '', $transient );
-        delete_transient( $key );
-    }
-
-    if ( class_exists( 'WC_Cache_Helper' ) ) {
-        WC_Cache_Helper::delete_version( 'cart' );
-        WC_Cache_Helper::delete_version( 'shipping' );
-        WC_Cache_Helper::delete_version( 'fee' );
-    }
-});
