@@ -1,7 +1,7 @@
 === Simple Price Fee ===
 Contributors: autotech24
 Donate link: https://www.autotech24.eu
-Tags: woocommerce, fee, discount, cart, checkout
+Tags: woocommerce, fee, discount, cart, checkout, price adjustment
 Requires at least: 5.0
 Tested up to: 6.5
 Requires PHP: 7.2
@@ -10,7 +10,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Adds a fixed fee or discount to WooCommerce cart total based on subtotal ranges, with a customizable label shown at checkout and in the cart.
+Adds a fixed fee or discount to the WooCommerce cart total based on subtotal ranges, with a customizable label shown at checkout and in the cart.
 
 == Description ==
 This plugin allows WooCommerce store owners to define fixed price fees or discounts based on subtotal ranges. For example, you can charge an extra 50 CZK if subtotal is under 500 CZK, or give a 100 CZK discount over 2000 CZK.
@@ -18,7 +18,11 @@ This plugin allows WooCommerce store owners to define fixed price fees or discou
 == Installation ==
 1. Upload the `simple-price-fee` folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Go to 'Price Fee' in the admin menu to configure your rules.
+3. Go to 'Settings > Simple Price Fee' in the admin menu to configure your rules.
+
+== Frequently Asked Questions ==
+= Where can I report issues? =
+You can report bugs or request features on GitHub: https://github.com/autotech24/simple-price-fee/issues
 
 == Changelog ==
 = 1.0.0 =

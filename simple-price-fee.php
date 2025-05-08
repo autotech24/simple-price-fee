@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Simple Price Fee
- * Plugin URI:        https://github.com/tvoje-uzivatelske-jmeno/simple-price-fee
+ * Plugin URI:        https://github.com/autotech24/simple-price-fee
  * Description:       Adds a fixed fee or discount to WooCommerce cart total based on subtotal ranges, with a customizable single label.
  * Version:           1.0.0
  * Requires at least: 5.0
