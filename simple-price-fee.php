@@ -6,7 +6,7 @@
  * Version:           1.0.0
  * Requires at least: 5.0
  * Requires PHP:      7.2
- * Requires Plugins:  WooCommerce
+ * Requires Plugins:  woocommerce
  * Author:            Autotech24
  * Author URI:        https://www.autotech24.eu
  * License:           GPLv2 or later
@@ -150,7 +150,9 @@ add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
 add_action( 'update_option_spf_settings', function () {
     global $wpdb;
 
-    $transients = $wpdb->get_col("
+    // Direct DB query is used here to identify transients by pattern.
+// WordPress does not provide a native API to list/delete transients by wildcard.
+$transients = $wpdb->get_col("
         SELECT option_name FROM {$wpdb->options}
         WHERE option_name LIKE '_transient_%'
         AND (
