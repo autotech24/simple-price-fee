@@ -3,7 +3,7 @@
  * Plugin Name:       Simple Price Fee
  * Plugin URI:        https://github.com/autotech24/simple-price-fee
  * Description:       Adds a fixed fee or discount to WooCommerce cart total based on subtotal ranges, with a customizable single label. Requires WooCommerce.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.0
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
@@ -19,15 +19,26 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Register plugin settings with sanitization
+define( 'AT24SPF_URL', plugin_dir_url(__FILE__) );
+define( 'AT24SPF_PATH', plugin_dir_path(__FILE__) );
+
+// Enqueue assets on settings page
+add_action( 'admin_enqueue_scripts', function( $hook ) {
+    if ( $hook === 'settings_page_simple_price_fee' ) {
+        wp_enqueue_script( 'at24spf-admin', AT24SPF_URL . 'assets/admin.js', [], '1.0', true );
+        wp_enqueue_style( 'at24spf-admin-style', AT24SPF_URL . 'assets/admin.css', [], '1.0' );
+    }
+});
+
+// Register plugin settings
 add_action( 'admin_init', function () {
-    register_setting( 'spf_group', 'spf_settings', [
-        'sanitize_callback' => 'spf_sanitize_settings'
+    register_setting( 'at24spf_group', 'at24spf_settings', [
+        'sanitize_callback' => 'at24spf_sanitize_settings'
     ]);
 });
 
-// Sanitize settings input
-function spf_sanitize_settings( $input ) {
+// Sanitize
+function at24spf_sanitize_settings( $input ) {
     if ( ! is_array( $input ) ) return [];
 
     $output = [];
@@ -47,85 +58,71 @@ function spf_sanitize_settings( $input ) {
     return $output;
 }
 
-// Add settings page under Settings menu
+// Admin menu
 add_action( 'admin_menu', function () {
     add_options_page(
         'Simple Price Fee Settings',
         'Simple Price Fee',
         'manage_woocommerce',
         'simple_price_fee',
-        'spf_admin_page'
+        'at24spf_admin_page'
     );
 });
 
-// Add "Settings" link in Plugins list
+// Settings link in plugin list
 add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), function ( $links ) {
     $url = admin_url( 'options-general.php?page=simple_price_fee' );
-    $settings_link = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'simple-price-fee' ) . '</a>';
-    array_unshift( $links, $settings_link );
+    array_unshift( $links, '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'simple-price-fee' ) . '</a>' );
     return $links;
 });
 
-// Admin settings page output
-function spf_admin_page() {
-    $settings = get_option( 'spf_settings', array( 'rules' => array(), 'label' => '' ) );
+// Admin page output
+function at24spf_admin_page() {
+    $settings = get_option( 'at24spf_settings', array( 'rules' => array(), 'label' => '' ) );
     $rules = $settings['rules'] ?? array();
     $label = $settings['label'] ?? '';
     ?>
     <div class="wrap">
         <h1>Simple Price Fee Settings</h1>
         <form method="post" action="options.php">
-            <?php settings_fields( 'spf_group' ); ?>
+            <?php settings_fields( 'at24spf_group' ); ?>
             <table class="form-table">
                 <tr>
                     <th scope="row">Fee Label (shown in cart)</th>
-                    <td><input type="text" name="spf_settings[label]" value="<?php echo esc_attr( $label ); ?>" class="regular-text" /></td>
+                    <td><input type="text" name="at24spf_settings[label]" value="<?php echo esc_attr( $label ); ?>" class="regular-text" /></td>
                 </tr>
             </table>
             <h2>Fee Rules</h2>
-            <table id="rules_table" class="widefat fixed">
+            <table id="at24spf_rules_table" class="widefat fixed">
                 <thead>
-                    <tr>
-                        <th>From (subtotal)</th>
-                        <th>To (subtotal)</th>
-                        <th>Amount (+ fee, – discount)</th>
-                    </tr>
+                <tr>
+                    <th>From (subtotal)</th>
+                    <th>To (subtotal)</th>
+                    <th>Amount (+ fee, – discount)</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $rules as $i => $rule ) : ?>
-                        <tr>
-                            <td><input name="spf_settings[rules][<?php echo esc_attr( $i ); ?>][min]" type="number" step="0.01" value="<?php echo esc_attr( $rule['min'] ); ?>"></td>
-                            <td><input name="spf_settings[rules][<?php echo esc_attr( $i ); ?>][max]" type="number" step="0.01" value="<?php echo esc_attr( $rule['max'] ); ?>"></td>
-                            <td><input name="spf_settings[rules][<?php echo esc_attr( $i ); ?>][amount]" type="number" step="0.01" value="<?php echo esc_attr( $rule['amount'] ); ?>"></td>
-                        </tr>
-                    <?php endforeach; ?>
+                <?php foreach ( $rules as $i => $rule ) : ?>
+                    <tr>
+                        <td><input name="at24spf_settings[rules][<?php echo esc_attr( $i ); ?>][min]" type="number" step="0.01" value="<?php echo esc_attr( $rule['min'] ); ?>"></td>
+                        <td><input name="at24spf_settings[rules][<?php echo esc_attr( $i ); ?>][max]" type="number" step="0.01" value="<?php echo esc_attr( $rule['max'] ); ?>"></td>
+                        <td><input name="at24spf_settings[rules][<?php echo esc_attr( $i ); ?>][amount]" type="number" step="0.01" value="<?php echo esc_attr( $rule['amount'] ); ?>"></td>
+                    </tr>
+                <?php endforeach; ?>
                 </tbody>
             </table>
-            <p><button type="button" class="button" onclick="spf_addRow()">+ Add Rule</button></p>
-            <script>
-                function spf_addRow() {
-                    const tbody = document.getElementById('rules_table').getElementsByTagName('tbody')[0];
-                    const index = tbody.rows.length;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><input name="spf_settings[rules][${index}][min]" type="number" step="0.01"></td>
-                        <td><input name="spf_settings[rules][${index}][max]" type="number" step="0.01"></td>
-                        <td><input name="spf_settings[rules][${index}][amount]" type="number" step="0.01"></td>
-                    `;
-                    tbody.appendChild(row);
-                }
-            </script>
+            <p><button type="button" class="button" id="at24spf_add_rule">+ Add Rule</button></p>
             <?php submit_button( 'Save Settings' ); ?>
         </form>
     </div>
     <?php
 }
 
-// Add fee to WooCommerce cart based on subtotal ranges
+// WooCommerce fee logic
 add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
     if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
 
-    $settings = get_option( 'spf_settings', array() );
+    $settings = get_option( 'at24spf_settings', array() );
     $rules = $settings['rules'] ?? array();
     $label = $settings['label'] ?? 'Price Adjustment';
     $subtotal = $cart->get_subtotal();

@@ -1,12 +1,12 @@
 === Simple Price Fee ===
-Contributors: autotech24
+Contributors: autotech24eu
 Donate link: https://www.autotech24.eu
 Tags: woocommerce, fee, discount, cart, checkout
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
 Requires Plugins: WooCommerce
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,5 +21,11 @@ This plugin allows WooCommerce store owners to define fixed price fees or discou
 3. Go to 'Settings > Simple Price Fee' to configure your rules.
 
 == Changelog ==
+
+= 1.0.1 =
+* Improved prefix to avoid naming conflicts.
+* Added wp_enqueue_script and wp_enqueue_style for compliance.
+* Removed inline <script> usage from settings page.
+
 = 1.0.0 =
 * Initial release.
