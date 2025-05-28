@@ -3,7 +3,7 @@
  * Plugin Name:       Simple Price Fee
  * Plugin URI:        https://github.com/autotech24/simple-price-fee
  * Description:       Adds a fixed fee or discount to WooCommerce cart total based on subtotal ranges, with a customizable single label. Requires WooCommerce.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 5.0
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
